@@ -11,3 +11,7 @@ __pycache__/
 .nox/
 .pnpm-store/
 *.py[cod]
+
+# 构建与本地缓存
+dist/
+.npm-cache/

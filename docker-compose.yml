@@ -1,0 +1,27 @@
+services:
+  web:
+    build:
+      context: .
+      target: web
+    image: phase-unwrap-web:latest
+    ports:
+      # 宿主机端口可通过环境变量 HOST_PORT 配置，默认 8080
+      - "${HOST_PORT:-8080}:80"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/healthz"]
+      interval: 5s
+      timeout: 3s
+      start_period: 3s
+      retries: 6
+
+  # 一次性核验：代码测试 + 构建检查 + HTTP 冒烟，结束自行退出并以退出码报告结果
+  verify:
+    build:
+      context: .
+      target: verify
+    image: phase-unwrap-verify:latest
+    depends_on:
+      web:
+        condition: service_healthy
+    restart: "no"
